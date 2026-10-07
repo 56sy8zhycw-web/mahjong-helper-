@@ -1,0 +1,84 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>兩人麻將助手</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-serif;color:#555;background:#fff}
+main{max-width:900px;margin:auto;padding:16px 10px 30px} h1{font-size:25px;margin:4px 8px 20px} h2{font-size:27px;font-weight:500;margin:12px 8px}
+.area{min-height:250px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;padding:8px;border-bottom:1px solid #eee}
+.pick{width:70px;padding:5px;background:#ffcaca;border-radius:13px;text-align:center}.tile,.key{border:3px solid #111;border-radius:8px;background:linear-gradient(145deg,#fff 0 76%,#dcebd7 77%);box-shadow:inset -5px -4px #087a31;font-family:serif;font-weight:900}
+.tile{height:76px;display:flex;align-items:center;justify-content:center}.x{border:0;background:transparent;color:#e32b2b;font-size:31px;width:100%;height:32px}
+.rows{margin-top:15px}.row{display:grid;gap:4px;margin:8px 0}.m{grid-template-columns:repeat(9,1fr)}.h{grid-template-columns:repeat(8,1fr)}
+.key{aspect-ratio:.72;min-width:0;display:flex;align-items:center;justify-content:center;padding:0}.key:active{transform:scale(.93)}
+.face{display:flex;flex-direction:column;line-height:.86;align-items:center}.num{font-size:clamp(20px,4.6vw,39px);color:#2450a2}.wan{font-size:clamp(15px,3.5vw,29px);color:#d72d25}.hon{font-size:clamp(25px,5.2vw,45px)}.b{color:#2450a2}.r{color:#d72d25}.g{color:#087f43}
+.controls{display:flex;gap:8px;justify-content:center;margin:15px 0}.controls button,.bottom button,.mode button{border:0;border-radius:17px;padding:13px 17px;font-weight:700;font-size:16px}
+.gray{background:#eee;color:#666}.blue{background:#dceaff;color:#0764df}.yellow{background:#fff0bd;color:#bd7200}
+.bottom{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}.bottom button{font-size:20px;padding:18px}
+.page{display:none}.page.active{display:block}.mode{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:15px 6px}.mode button.active{background:#1675e8;color:white}
+.card{background:#f3f7ff;border-radius:18px;padding:18px;margin:14px 5px}.best{font-size:32px;font-weight:900;color:#0764df;margin:8px 0}.rank{padding:12px 0;border-top:1px solid #ddd}
+.note{text-align:center;color:#999;font-size:13px;margin:8px}.toast{position:fixed;left:50%;bottom:25px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 15px;border-radius:10px;display:none;z-index:9;white-space:nowrap}
+</style></head><body><main>
+<h1>兩人麻將助手</h1>
+
+<section id="handPage" class="page active">
+<h2>我的手牌 <small id="hc">0 / 14</small></h2><div id="hand" class="area"></div>
+<div class="controls"><button id="undoH" class="yellow">⌫ 刪除上一張</button><button id="clearH" class="gray">清除所有牌</button></div>
+<div class="note">直接點下方麻將牌輸入</div>
+<div class="rows">
+<div class="row m">
+<button class="key addH" data-t="1m"><span class="face"><span class="num">一</span><span class="wan">萬</span></span></button>
+<button class="key addH" data-t="2m"><span class="face"><span class="num">二</span><span class="wan">萬</span></span></button>
+<button class="key addH" data-t="3m"><span class="face"><span class="num">三</span><span class="wan">萬</span></span></button>
+<button class="key addH" data-t="4m"><span class="face"><span class="num">四</span><span class="wan">萬</span></span></button>
+<button class="key addH" data-t="5m"><span class="face"><span class="num">伍</span><span class="wan">萬</span></span></button>
+<button class="key addH" data-t="6m"><span class="face"><span class="num">六</span><span class="wan">萬</span></span></button>
+<button class="key addH" data-t="7m"><span class="face"><span class="num">七</span><span class="wan">萬</span></span></button>
+<button class="key addH" data-t="8m"><span class="face"><span class="num">八</span><span class="wan">萬</span></span></button>
+<button class="key addH" data-t="9m"><span class="face"><span class="num">九</span><span class="wan">萬</span></span></button>
+</div>
+<div class="row h">
+<button class="key addH" data-t="E"><span class="hon b">東</span></button><button class="key addH" data-t="S"><span class="hon b">南</span></button>
+<button class="key addH" data-t="W"><span class="hon b">西</span></button><button class="key addH" data-t="N"><span class="hon b">北</span></button>
+<button class="key addH" data-t="R"><span class="hon r">中</span></button><button class="key addH" data-t="G"><span class="hon g">發</span></button>
+<button class="key addH" data-t="B"><span class="hon b">白</span></button><button id="bsH" class="key gray">⌫</button>
+</div></div>
+<div class="bottom"><button id="resetH" class="gray">取消</button><button id="toRiver" class="blue">確定</button></div>
+</section>
+
+<section id="riverPage" class="page">
+<h2>對手牌河 <small id="rc">0 張</small></h2><div id="river" class="area"></div>
+<div class="controls"><button id="undoR" class="yellow">⌫ 刪除上一張</button><button id="clearR" class="gray">清除牌河</button></div>
+<div class="note">依照對手實際出牌順序輸入</div>
+<div class="rows">
+<div class="row m">
+<button class="key addR" data-t="1m"><span class="face"><span class="num">一</span><span class="wan">萬</span></span></button><button class="key addR" data-t="2m"><span class="face"><span class="num">二</span><span class="wan">萬</span></span></button><button class="key addR" data-t="3m"><span class="face"><span class="num">三</span><span class="wan">萬</span></span></button><button class="key addR" data-t="4m"><span class="face"><span class="num">四</span><span class="wan">萬</span></span></button><button class="key addR" data-t="5m"><span class="face"><span class="num">伍</span><span class="wan">萬</span></span></button><button class="key addR" data-t="6m"><span class="face"><span class="num">六</span><span class="wan">萬</span></span></button><button class="key addR" data-t="7m"><span class="face"><span class="num">七</span><span class="wan">萬</span></span></button><button class="key addR" data-t="8m"><span class="face"><span class="num">八</span><span class="wan">萬</span></span></button><button class="key addR" data-t="9m"><span class="face"><span class="num">九</span><span class="wan">萬</span></span></button>
+</div><div class="row h">
+<button class="key addR" data-t="E"><span class="hon b">東</span></button><button class="key addR" data-t="S"><span class="hon b">南</span></button><button class="key addR" data-t="W"><span class="hon b">西</span></button><button class="key addR" data-t="N"><span class="hon b">北</span></button><button class="key addR" data-t="R"><span class="hon r">中</span></button><button class="key addR" data-t="G"><span class="hon g">發</span></button><button class="key addR" data-t="B"><span class="hon b">白</span></button><button id="bsR" class="key gray">⌫</button>
+</div></div>
+<div class="mode"><button data-mode="def">防守</button><button data-mode="bal" class="active">平衡</button><button data-mode="atk">進攻</button></div>
+<div class="bottom"><button id="backH" class="gray">返回手牌</button><button id="analyze" class="blue">開始分析</button></div>
+</section>
+
+<section id="resultPage" class="page"><h2>建議出牌</h2><div class="card"><div>第一推薦</div><div id="best" class="best">—</div><div id="details"></div></div>
+<div class="bottom"><button id="backR" class="gray">修改牌河</button><button id="next" class="blue">下一巡</button></div></section>
+</main><div id="toast" class="toast"></div>
+<script>
+const names={"1m":"一萬","2m":"二萬","3m":"三萬","4m":"四萬","5m":"伍萬","6m":"六萬","7m":"七萬","8m":"八萬","9m":"九萬",E:"東",S:"南",W:"西",N:"北",R:"中",G:"發",B:"白"};
+const nums={"1m":"一","2m":"二","3m":"三","4m":"四","5m":"伍","6m":"六","7m":"七","8m":"八","9m":"九"};
+let H=[],R=[],mode="bal";
+function face(t){if(t.endsWith("m"))return `<span class="face"><span class="num">${nums[t]}</span><span class="wan">萬</span></span>`;let c=t==="R"?"r":t==="G"?"g":"b";return `<span class="hon ${c}">${names[t]}</span>`}
+function toast(s){let x=document.getElementById("toast");x.textContent=s;x.style.display="block";setTimeout(()=>x.style.display="none",1100)}
+function known(t){return H.filter(x=>x===t).length+R.filter(x=>x===t).length}
+function render(){hand.innerHTML=H.map((t,i)=>`<div class="pick"><div class="tile">${face(t)}</div><button class="x" onclick="delH(${i})">×</button></div>`).join("");river.innerHTML=R.map((t,i)=>`<div class="pick"><div class="tile">${face(t)}</div><button class="x" onclick="delR(${i})">×</button></div>`).join("");hc.textContent=H.length+" / 14";rc.textContent=R.length+" 張"}
+function add(arr,t,max){if(known(t)>=4)return toast(names[t]+"已出現4張");if(max&&arr.length>=max)return toast("手牌最多14張");arr.push(t);render()}
+function delH(i){H.splice(i,1);render()} function delR(i){R.splice(i,1);render()}
+document.querySelectorAll(".addH").forEach(b=>b.onclick=()=>add(H,b.dataset.t,14));document.querySelectorAll(".addR").forEach(b=>b.onclick=()=>add(R,b.dataset.t));
+undoH.onclick=bsH.onclick=()=>{H.pop();render()};undoR.onclick=bsR.onclick=()=>{R.pop();render()};clearH.onclick=resetH.onclick=()=>{H=[];render()};clearR.onclick=()=>{R=[];render()};
+function page(id){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");scrollTo(0,0)}
+toRiver.onclick=()=>{if(H.length!==13&&H.length!==14)return toast("請輸入13張或14張");page("riverPage")};backH.onclick=()=>page("handPage");backR.onclick=()=>page("riverPage");
+document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll("[data-mode]").forEach(x=>x.classList.remove("active"));b.classList.add("active")});
+function risk(t){let v=45;if(R.includes(t))v=5;if(t.endsWith("m")){let n=+t[0];R.forEach((x,i)=>{if(x.endsWith("m")){let d=Math.abs(n-(+x[0]));let rec=(i+1)/Math.max(1,R.length);if(d===1)v-=12*rec;if(d===2)v-=7*rec}})}return Math.max(0,Math.min(100,v))}
+function shapeAfter(t){let a=H.slice();a.splice(a.indexOf(t),1);let s=0;for(let n=1;n<=9;n++){let c=a.filter(x=>x===n+"m").length;if(c>=2)s+=6;if(a.includes(n+"m")&&a.includes((n+1)+"m"))s+=4}["E","S","W","N","R","G","B"].forEach(x=>{let c=a.filter(y=>y===x).length;if(c>=2)s+=6});return s}
+analyze.onclick=()=>{if(H.length!==14)return toast("分析出牌時需要14張手牌");let unique=[...new Set(H)],w=mode==="def"?[.8,.2]:mode==="atk"?[.25,.75]:[.5,.5];let scored=unique.map(t=>{let r=risk(t),a=shapeAfter(t),score=w[0]*(100-r)+w[1]*a;return {t,r,a,score}}).sort((a,b)=>b.score-a.score);best.textContent="打 "+names[scored[0].t];details.innerHTML=scored.slice(0,5).map((x,i)=>`<div class="rank">${i+1}. ${names[x.t]}　安全度 ${Math.round(100-x.r)}　牌型分 ${x.a}</div>`).join("")+"<div class='note'>此版先使用本機快速評分；下一版接完整等待牌/危險度模型。</div>";page("resultPage")};
+next.onclick=()=>page("handPage");render();
+</script></body></html>
