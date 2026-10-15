@@ -1,7 +1,7 @@
 <!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>兩人麻將助手</title>
+<title>兩人麻將助手 v2.0</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-serif;color:#555;background:#fff}
 main{max-width:900px;margin:auto;padding:16px 10px 30px} h1{font-size:25px;margin:4px 8px 20px} h2{font-size:27px;font-weight:500;margin:12px 8px}
@@ -16,9 +16,9 @@ main{max-width:900px;margin:auto;padding:16px 10px 30px} h1{font-size:25px;margi
 .bottom{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}.bottom button{font-size:20px;padding:18px}
 .page{display:none}.page.active{display:block}.mode{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:15px 6px}.mode button.active{background:#1675e8;color:white}
 .card{background:#f3f7ff;border-radius:18px;padding:18px;margin:14px 5px}.best{font-size:32px;font-weight:900;color:#0764df;margin:8px 0}.rank{padding:12px 0;border-top:1px solid #ddd}
-.note{text-align:center;color:#999;font-size:13px;margin:8px}.toast{position:fixed;left:50%;bottom:25px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 15px;border-radius:10px;display:none;z-index:9;white-space:nowrap}
+.callbar{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 4px}.callbar button{border:0;border-radius:13px;padding:12px 4px;font-size:17px;font-weight:800;background:#eee;color:#555}.callbar button.active{background:#1675e8;color:#fff}.calls{min-height:50px;background:#f6f8fb;border-radius:14px;padding:12px;margin:8px 3px}.callitem{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:5px 0}.callitem button{border:0;color:#d22;background:#ffe6e6;border-radius:9px;padding:6px 12px}.callchip{background:#fff;border:1px solid #bbb;padding:7px;border-radius:6px}.eatpanel{display:none;padding:9px;background:#eaf3ff;border-radius:12px;margin:8px 3px}.eatpanel button{border:0;border-radius:9px;padding:8px 12px;margin:4px;background:#fff}.newgame{border:0;border-radius:14px;background:#dff4e6;color:#087a31;font-size:17px;font-weight:800;padding:12px 17px;white-space:nowrap}.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 8px 20px}.topbar h1{margin:0}.note{text-align:center;color:#999;font-size:13px;margin:8px}.toast{position:fixed;left:50%;bottom:25px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 15px;border-radius:10px;display:none;z-index:9;white-space:nowrap}
 </style></head><body><main>
-<h1>兩人麻將助手</h1>
+<div class="topbar"><h1>兩人麻將助手</h1><button type="button" id="newGame" class="newgame">新局</button></div>
 
 <section id="handPage" class="page active">
 <h2>我的手牌 <small id="hc">0 / 14</small></h2><div id="hand" class="area"></div>
@@ -48,7 +48,11 @@ main{max-width:900px;margin:auto;padding:16px 10px 30px} h1{font-size:25px;margi
 <section id="riverPage" class="page">
 <h2>對手牌河 <small id="rc">0 張</small></h2><div id="river" class="area"></div>
 <div class="controls"><button id="undoR" class="yellow">⌫ 刪除上一張</button><button id="clearR" class="gray">清除牌河</button></div>
-<div class="note">依照對手實際出牌順序輸入</div>
+<div class="note">同一頁記錄對手打牌、吃牌與碰牌</div>
+<div class="callbar"><button type="button" data-action="discard" class="active">出牌</button><button type="button" data-action="chi">吃</button><button type="button" data-action="pong">碰</button></div>
+<div id="actionHint" class="note">目前：點牌記錄對手打出的牌</div>
+<div id="eatPanel" class="eatpanel"><div>已選吃牌：<strong id="eatSelected">尚未選擇</strong></div><button id="eatUndo" type="button">刪除上一張</button><button id="eatCancel" type="button">取消</button><button id="eatConfirm" type="button">確認吃牌</button></div>
+<h2 style="font-size:20px">對手吃碰明牌 <small id="cc">0 組</small></h2><div id="calls" class="calls">尚無吃碰紀錄</div>
 <div class="rows">
 <div class="row m">
 <button class="key addR" data-t="1m"><span class="face"><span class="num">一</span><span class="wan">萬</span></span></button><button class="key addR" data-t="2m"><span class="face"><span class="num">二</span><span class="wan">萬</span></span></button><button class="key addR" data-t="3m"><span class="face"><span class="num">三</span><span class="wan">萬</span></span></button><button class="key addR" data-t="4m"><span class="face"><span class="num">四</span><span class="wan">萬</span></span></button><button class="key addR" data-t="5m"><span class="face"><span class="num">伍</span><span class="wan">萬</span></span></button><button class="key addR" data-t="6m"><span class="face"><span class="num">六</span><span class="wan">萬</span></span></button><button class="key addR" data-t="7m"><span class="face"><span class="num">七</span><span class="wan">萬</span></span></button><button class="key addR" data-t="8m"><span class="face"><span class="num">八</span><span class="wan">萬</span></span></button><button class="key addR" data-t="9m"><span class="face"><span class="num">九</span><span class="wan">萬</span></span></button>
@@ -65,20 +69,26 @@ main{max-width:900px;margin:auto;padding:16px 10px 30px} h1{font-size:25px;margi
 <script>
 const names={"1m":"一萬","2m":"二萬","3m":"三萬","4m":"四萬","5m":"伍萬","6m":"六萬","7m":"七萬","8m":"八萬","9m":"九萬",E:"東",S:"南",W:"西",N:"北",R:"中",G:"發",B:"白"};
 const nums={"1m":"一","2m":"二","3m":"三","4m":"四","5m":"伍","6m":"六","7m":"七","8m":"八","9m":"九"};
-let H=[],R=[],mode="bal";
+let H=[],R=[],C=[],eatDraft=[],action="discard",mode="bal";
 function face(t){if(t.endsWith("m"))return `<span class="face"><span class="num">${nums[t]}</span><span class="wan">萬</span></span>`;let c=t==="R"?"r":t==="G"?"g":"b";return `<span class="hon ${c}">${names[t]}</span>`}
 function toast(s){let x=document.getElementById("toast");x.textContent=s;x.style.display="block";setTimeout(()=>x.style.display="none",1100)}
-function known(t){return H.filter(x=>x===t).length+R.filter(x=>x===t).length}
-function render(){hand.innerHTML=H.map((t,i)=>`<div class="pick"><div class="tile">${face(t)}</div><button class="x" onclick="delH(${i})">×</button></div>`).join("");river.innerHTML=R.map((t,i)=>`<div class="pick"><div class="tile">${face(t)}</div><button class="x" onclick="delR(${i})">×</button></div>`).join("");hc.textContent=H.length+" / 14";rc.textContent=R.length+" 張"}
+function known(t){return H.filter(x=>x===t).length+R.filter(x=>x===t).length+C.reduce((n,c)=>n+c.tiles.filter(x=>x===t).length,0)}
+function render(){hand.innerHTML=H.map((t,i)=>`<div class="pick"><div class="tile">${face(t)}</div><button class="x" onclick="delH(${i})">×</button></div>`).join("");river.innerHTML=R.map((t,i)=>`<div class="pick"><div class="tile">${face(t)}</div><button class="x" onclick="delR(${i})">×</button></div>`).join("");hc.textContent=H.length+" / 14";rc.textContent=R.length+" 張";cc.textContent=C.length+" 組";calls.innerHTML=C.length?C.map((c,i)=>`<div class="callitem"><b>${c.kind==="pong"?"碰":"吃"}</b>${c.tiles.map(t=>`<span class="callchip">${names[t]}</span>`).join("")}<button onclick="delC(${i})">× 刪除</button></div>`).join(""):"尚無吃碰紀錄";eatSelected.textContent=eatDraft.length?eatDraft.map(t=>names[t]).join("、"):"尚未選擇"}
 function add(arr,t,max){if(known(t)>=4)return toast(names[t]+"已出現4張");if(max&&arr.length>=max)return toast("手牌最多14張");arr.push(t);render()}
-function delH(i){H.splice(i,1);render()} function delR(i){R.splice(i,1);render()}
-document.querySelectorAll(".addH").forEach(b=>b.onclick=()=>add(H,b.dataset.t,14));document.querySelectorAll(".addR").forEach(b=>b.onclick=()=>add(R,b.dataset.t));
+function delH(i){H.splice(i,1);render()} function delR(i){R.splice(i,1);render()} function delC(i){C.splice(i,1);render()}
+document.querySelectorAll(".addH").forEach(b=>b.onclick=()=>add(H,b.dataset.t,14));
+function chooseRiver(t){if(action==="discard"){add(R,t);return}if(action==="pong"){if(known(t)+3>4)return toast("此牌剩餘不足3張");C.push({kind:"pong",tiles:[t,t,t]});render();toast("已記錄碰 "+names[t]);return}if(!t.endsWith("m"))return toast("字牌不能吃");if(eatDraft.length>=3)return toast("請先確認或取消吃牌");if(known(t)+eatDraft.filter(x=>x===t).length>=4)return toast("此牌已達4張");eatDraft.push(t);render()}
+document.querySelectorAll(".addR").forEach(b=>b.onclick=()=>chooseRiver(b.dataset.t));
+function setAction(a){action=a;eatDraft=[];document.querySelectorAll("[data-action]").forEach(b=>b.classList.toggle("active",b.dataset.action===a));eatPanel.style.display=a==="chi"?"block":"none";actionHint.textContent=a==="discard"?"目前：點牌記錄對手打出的牌":a==="pong"?"目前：點一張牌，自動記錄三張碰牌":"目前：依序點選三張連續萬子，再按確認";render()}
+document.querySelectorAll("[data-action]").forEach(b=>b.onclick=()=>setAction(b.dataset.action));eatUndo.onclick=()=>{eatDraft.pop();render()};eatCancel.onclick=()=>{eatDraft=[];render()};eatConfirm.onclick=()=>{if(eatDraft.length!==3)return toast("請選滿三張");let ns=eatDraft.map(t=>+t[0]).sort((a,b)=>a-b);if(ns[1]!==ns[0]+1||ns[2]!==ns[1]+1)return toast("吃牌必須是連續三張");C.push({kind:"chi",tiles:[...eatDraft].sort((a,b)=>+a[0]-+b[0])});eatDraft=[];render();toast("已記錄吃牌")};
 undoH.onclick=bsH.onclick=()=>{H.pop();render()};undoR.onclick=bsR.onclick=()=>{R.pop();render()};clearH.onclick=resetH.onclick=()=>{H=[];render()};clearR.onclick=()=>{R=[];render()};
 function page(id){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");scrollTo(0,0)}
 toRiver.onclick=()=>{if(H.length!==13&&H.length!==14)return toast("請輸入13張或14張");page("riverPage")};backH.onclick=()=>page("handPage");backR.onclick=()=>page("riverPage");
 document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll("[data-mode]").forEach(x=>x.classList.remove("active"));b.classList.add("active")});
-function risk(t){let v=45;if(R.includes(t))v=5;if(t.endsWith("m")){let n=+t[0];R.forEach((x,i)=>{if(x.endsWith("m")){let d=Math.abs(n-(+x[0]));let rec=(i+1)/Math.max(1,R.length);if(d===1)v-=12*rec;if(d===2)v-=7*rec}})}return Math.max(0,Math.min(100,v))}
+function risk(t){let v=45;if(R.includes(t))v=5;if(t.endsWith("m")){let n=+t[0];R.forEach((x,i)=>{if(x.endsWith("m")){let d=Math.abs(n-(+x[0]));let rec=(i+1)/Math.max(1,R.length);if(d===1)v-=12*rec;if(d===2)v-=7*rec}})}// 明牌只調整可見張數；不把吃碰直接當成特定等待牌的證據
+return Math.max(0,Math.min(100,v))}
 function shapeAfter(t){let a=H.slice();a.splice(a.indexOf(t),1);let s=0;for(let n=1;n<=9;n++){let c=a.filter(x=>x===n+"m").length;if(c>=2)s+=6;if(a.includes(n+"m")&&a.includes((n+1)+"m"))s+=4}["E","S","W","N","R","G","B"].forEach(x=>{let c=a.filter(y=>y===x).length;if(c>=2)s+=6});return s}
-analyze.onclick=()=>{if(H.length!==14)return toast("分析出牌時需要14張手牌");let unique=[...new Set(H)],w=mode==="def"?[.8,.2]:mode==="atk"?[.25,.75]:[.5,.5];let scored=unique.map(t=>{let r=risk(t),a=shapeAfter(t),score=w[0]*(100-r)+w[1]*a;return {t,r,a,score}}).sort((a,b)=>b.score-a.score);best.textContent="打 "+names[scored[0].t];details.innerHTML=scored.slice(0,5).map((x,i)=>`<div class="rank">${i+1}. ${names[x.t]}　安全度 ${Math.round(100-x.r)}　牌型分 ${x.a}</div>`).join("")+"<div class='note'>此版先使用本機快速評分；下一版接完整等待牌/危險度模型。</div>";page("resultPage")};
+analyze.onclick=()=>{if(H.length!==14)return toast("分析出牌時需要14張手牌");let unique=[...new Set(H)],w=mode==="def"?[.8,.2]:mode==="atk"?[.25,.75]:[.5,.5];let scored=unique.map(t=>{let r=risk(t),a=shapeAfter(t),score=w[0]*(100-r)+w[1]*a;return {t,r,a,score}}).sort((a,b)=>b.score-a.score);best.textContent="打 "+names[scored[0].t];details.innerHTML=scored.slice(0,5).map((x,i)=>`<div class="rank">${i+1}. ${names[x.t]}　安全度 ${Math.round(100-x.r)}　牌型分 ${x.a}</div>`).join("")+"<div class='note'>已記錄對手吃碰 "+C.length+" 組。此版吃碰會納入已知牌數，但安全度仍為簡易啟發式分數，尚非真實放槍機率。</div>";page("resultPage")};
+newGame.onclick=()=>{if(!confirm("確定開始新局？將清空手牌、牌河、吃碰紀錄與分析結果。"))return;H=[];R=[];C=[];eatDraft=[];setAction("discard");mode="bal";document.querySelectorAll("[data-mode]").forEach(b=>b.classList.toggle("active",b.dataset.mode==="bal"));best.textContent="—";details.innerHTML="";render();page("handPage");toast("新局已開始，所有紀錄已清空")};
 next.onclick=()=>page("handPage");render();
 </script></body></html>
